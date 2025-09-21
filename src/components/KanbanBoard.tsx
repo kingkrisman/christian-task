@@ -4,6 +4,7 @@ import { KanbanColumn } from "./KanbanColumn";
 import { TaskModal } from "./TaskModal";
 import { SearchFilter } from "./SearchFilter";
 import { TaskProgress3D } from "./TaskProgress3D";
+import TaskActivity3DOverlay from "./TaskActivity3DOverlay";
 import { useTaskManager } from "../hooks/useTaskManager";
 import { Task } from "../lib/data";
 import {
@@ -37,6 +38,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ screenSize }) => {
     updateTask,
     deleteTask,
     moveTask,
+    isAdding,
   } = useTaskManager();
 
   const [taskModal, setTaskModal] = useState<{
@@ -102,9 +104,13 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ screenSize }) => {
     setTaskModal({ isOpen: true, mode: "edit", task });
   };
 
-  const handleSaveTask = (taskData: Partial<Task>) => {
+  const [showCelebration, setShowCelebration] = useState(false);
+
+  const handleSaveTask = async (taskData: Partial<Task>) => {
     if (taskModal.mode === "create") {
-      addTask(taskData);
+      await addTask(taskData);
+      setShowCelebration(true);
+      setTimeout(() => setShowCelebration(false), 1200);
     } else if (taskModal.task) {
       updateTask(taskModal.task.id, taskData);
     }
@@ -207,7 +213,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ screenSize }) => {
     <div
       className={`flex flex-col flex-1 min-h-screen transition-all duration-300 ${
         isDark ? "bg-dark-primary" : "bg-white"
-      } ${isFullscreen ? "fixed inset-0 z-50" : ""}`}
+      } ${isFullscreen ? "fixed inset-0 z-50" : ""} relative`}
     >
       {/* Header - Desktop/Tablet only */}
       {screenSize !== "mobile" && <Header screenSize={screenSize} />}
@@ -685,6 +691,16 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ screenSize }) => {
             Focus
           </div>
         </div>
+      )}
+
+      {/* Overlays */}
+      {isAdding && <TaskActivity3DOverlay mode="loading" isDark={isDark} />}
+      {showCelebration && !isAdding && (
+        <TaskActivity3DOverlay
+          mode="success"
+          isDark={isDark}
+          onDone={() => setShowCelebration(false)}
+        />
       )}
 
       {/* Task Modal */}
