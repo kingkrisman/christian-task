@@ -160,11 +160,13 @@ export default function Tasks() {
     >
       <LeftSidebar screenSize="desktop" />
 
-      {isAdding && (
-        <TaskActivity3DOverlay mode="loading" isDark={isDark} />
-      )}
+      {isAdding && <TaskActivity3DOverlay mode="loading" isDark={isDark} />}
       {showCelebration && !isAdding && (
-        <TaskActivity3DOverlay mode="success" isDark={isDark} onDone={() => setShowCelebration(false)} />
+        <TaskActivity3DOverlay
+          mode="success"
+          isDark={isDark}
+          onDone={() => setShowCelebration(false)}
+        />
       )}
 
       <div className="flex-1 ml-[90px] p-8">

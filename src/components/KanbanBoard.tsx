@@ -694,11 +694,13 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ screenSize }) => {
       )}
 
       {/* Overlays */}
-      {isAdding && (
-        <TaskActivity3DOverlay mode="loading" isDark={isDark} />
-      )}
+      {isAdding && <TaskActivity3DOverlay mode="loading" isDark={isDark} />}
       {showCelebration && !isAdding && (
-        <TaskActivity3DOverlay mode="success" isDark={isDark} onDone={() => setShowCelebration(false)} />
+        <TaskActivity3DOverlay
+          mode="success"
+          isDark={isDark}
+          onDone={() => setShowCelebration(false)}
+        />
       )}
 
       {/* Task Modal */}
