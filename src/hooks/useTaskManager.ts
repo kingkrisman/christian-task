@@ -10,6 +10,7 @@ export const useTaskManager = () => {
     priority: [],
     assignee: [],
   });
+  const [isAdding, setIsAdding] = useState(false);
 
   // Filtered and searched tasks
   const filteredTasks = useMemo(() => {
@@ -58,8 +59,9 @@ export const useTaskManager = () => {
     };
   }, [tasks]);
 
-  // Add new task
-  const addTask = (newTask: Partial<Task>) => {
+  // Add new task with a short async step to enable loading UI
+  const addTask = async (newTask: Partial<Task>) => {
+    setIsAdding(true);
     const task: Task = {
       id: Date.now().toString(),
       title: newTask.title || "",
@@ -81,7 +83,9 @@ export const useTaskManager = () => {
       priority: newTask.priority || "medium",
     };
 
+    await new Promise((res) => setTimeout(res, 600));
     setTasks((prev) => [...prev, task]);
+    setIsAdding(false);
   };
 
   // Update task
@@ -150,5 +154,6 @@ export const useTaskManager = () => {
     updateProgress,
     bulkUpdateStatus,
     duplicateTask,
+    isAdding,
   };
 };
