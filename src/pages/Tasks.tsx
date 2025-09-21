@@ -3,6 +3,7 @@ import { LeftSidebar } from "../components/LeftSidebar";
 import { useTheme } from "../contexts/ThemeContext";
 import { useTaskManager } from "../hooks/useTaskManager";
 import { TaskModal } from "../components/TaskModal";
+import TaskActivity3DOverlay from "../components/TaskActivity3DOverlay";
 import { Task } from "../lib/data";
 import {
   Plus,
@@ -34,6 +35,7 @@ export default function Tasks() {
     deleteTask,
     filters,
     searchQuery,
+    isAdding,
   } = useTaskManager();
 
   const [viewMode, setViewMode] = useState<"list" | "board">("list");
@@ -50,6 +52,7 @@ export default function Tasks() {
   const [sortBy, setSortBy] = useState<"date" | "priority" | "progress">(
     "date",
   );
+  const [showCelebration, setShowCelebration] = useState(false);
 
   const sortedTasks = [...filteredTasks].sort((a, b) => {
     switch (sortBy) {
@@ -120,19 +123,21 @@ export default function Tasks() {
     }
   };
 
-  const handleDuplicateTask = (task: Task) => {
+  const handleDuplicateTask = async (task: Task) => {
     const newTask = {
       ...task,
       id: Date.now().toString(),
       title: `${task.title} (Copy)`,
     };
-    addTask(newTask);
+    await addTask(newTask);
     setActiveTaskMenu(null);
+    setShowCelebration(true);
+    setTimeout(() => setShowCelebration(false), 1200);
   };
 
-  const handleSaveTask = (taskData: any) => {
+  const handleSaveTask = async (taskData: any) => {
     if (taskModal.mode === "create") {
-      addTask({
+      await addTask({
         ...taskData,
         id: Date.now().toString(),
         date: new Date().toLocaleDateString("en-US", {
@@ -141,6 +146,8 @@ export default function Tasks() {
           year: "numeric",
         }),
       });
+      setShowCelebration(true);
+      setTimeout(() => setShowCelebration(false), 1200);
     } else if (taskModal.task) {
       updateTask(taskModal.task.id, taskData);
     }
@@ -149,9 +156,16 @@ export default function Tasks() {
 
   return (
     <div
-      className={`flex w-full min-h-screen ${isDark ? "bg-dark-primary" : "bg-white"}`}
+      className={`flex w-full min-h-screen ${isDark ? "bg-dark-primary" : "bg-white"} relative`}
     >
       <LeftSidebar screenSize="desktop" />
+
+      {isAdding && (
+        <TaskActivity3DOverlay mode="loading" isDark={isDark} />
+      )}
+      {showCelebration && !isAdding && (
+        <TaskActivity3DOverlay mode="success" isDark={isDark} onDone={() => setShowCelebration(false)} />
+      )}
 
       <div className="flex-1 ml-[90px] p-8">
         {/* Header */}
